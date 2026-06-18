@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PDFParse } from "pdf-parse";
+import { extractText, getDocumentProxy } from "unpdf";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -25,12 +25,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const parser = new PDFParse({ data: buffer });
-    const result = await parser.getText();
-    await parser.destroy();
-
-    const text = (result.text || "").trim();
+    const buffer = new Uint8Array(await file.arrayBuffer());
+    const pdf = await getDocumentProxy(buffer);
+    const { text: extracted } = await extractText(pdf, { mergePages: true });
+    const text = (extracted || "").trim();
     if (text.length < 30) {
       return NextResponse.json(
         {
