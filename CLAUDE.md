@@ -12,7 +12,7 @@ First-generation immigrant parents who work hourly jobs and receive English-only
 - Next.js 14 (App Router, TypeScript, src/ directory)
 - Tailwind CSS v4
 - Supabase (Postgres + Storage)
-- Anthropic Claude API (use the latest Sonnet model)
+- Google Gemini API (`@google/genai`, latest Gemini Flash model) — switched from Anthropic Claude to use the free tier for the hackathon
 - Vercel deployment via GitHub
 - pdf-parse for PDF text extraction
 
