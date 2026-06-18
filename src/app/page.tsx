@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Loader2 } from "lucide-react";
+import { useDropzone } from "react-dropzone";
+import { Sparkles, Loader2, FileUp } from "lucide-react";
 import LanguagePicker from "@/components/LanguagePicker";
 import { getSessionId } from "@/lib/session";
 import { getSamples } from "@/lib/samples";
@@ -12,7 +13,34 @@ export default function Home() {
   const [text, setText] = useState("");
   const [language, setLanguage] = useState("en");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const onDrop = useCallback(async (files: File[]) => {
+    const file = files[0];
+    if (!file) return;
+    setError(null);
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not read that PDF.");
+      setText(data.text);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not read that PDF.");
+    } finally {
+      setUploading(false);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { "application/pdf": [".pdf"] },
+    maxFiles: 1,
+    noClick: false,
+  });
 
   async function handleSubmit() {
     setError(null);
@@ -78,6 +106,30 @@ export default function Home() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div
+          {...getRootProps()}
+          className={`mb-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition ${
+            isDragActive ? "border-accent bg-accent-soft" : "border-border bg-card"
+          }`}
+        >
+          <input {...getInputProps()} />
+          {uploading ? (
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-ink">
+              <Loader2 size={20} className="animate-spin" /> Reading your PDF…
+            </span>
+          ) : (
+            <>
+              <FileUp size={28} className="text-accent" />
+              <span className="mt-2 text-sm font-medium text-ink">
+                Drop a PDF here, or tap to choose a file
+              </span>
+              <span className="mt-1 text-xs text-muted">
+                We&apos;ll pull out the text — or just paste it below.
+              </span>
+            </>
+          )}
         </div>
 
         <textarea

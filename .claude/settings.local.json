@@ -7,7 +7,15 @@
       "Bash(curl -s http://localhost:3000/)",
       "Bash(npx tsc *)",
       "PowerShell(git add -A)",
-      "PowerShell(git push origin main 2>&1)"
+      "PowerShell(git push origin main 2>&1)",
+      "Bash(node -e \"console.log\\(require\\('pdf-parse/package.json'\\).version\\)\")",
+      "Bash(node -e \"const p=require\\('pdf-parse/package.json'\\); console.log\\('main:',p.main\\); console.log\\('module:',p.module\\); console.log\\('type:',p.type\\); console.log\\('exports:',JSON.stringify\\(p.exports\\)\\)\")",
+      "Bash(ls node_modules/pdf-parse/dist)",
+      "Bash(ls -la node_modules/pdf-parse/dist)",
+      "Bash(ls node_modules/pdf-parse/dist/cjs)",
+      "Bash(ls node_modules/pdf-parse/dist/esm)",
+      "Bash(node -e *)",
+      "Bash(echo \"dev starting, pid $!\")"
     ]
   }
 }
