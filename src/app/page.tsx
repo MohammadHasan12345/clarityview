@@ -20,13 +20,25 @@ export default function Home() {
     const file = files[0];
     if (!file) return;
     setError(null);
+    // Vercel caps upload bodies at ~4.5 MB. Stop big files before they fail.
+    if (file.size > 4 * 1024 * 1024) {
+      setError(
+        "That PDF is too big to upload (4 MB max). Try a smaller file, or copy and paste the text instead."
+      );
+      return;
+    }
     setUploading(true);
     try {
       const form = new FormData();
       form.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not read that PDF.");
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data) {
+        throw new Error(
+          data?.error ||
+            "We couldn't read that PDF. Try a smaller file, or paste the text instead."
+        );
+      }
       setText(data.text);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not read that PDF.");
@@ -59,8 +71,10 @@ export default function Home() {
           targetLanguage: language,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Something went wrong.");
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data) {
+        throw new Error(data?.error || "Something went wrong. Please try again.");
+      }
       router.push(`/result/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
