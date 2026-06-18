@@ -38,3 +38,18 @@ body {
 h1, h2, h3 {
   font-family: var(--font-fraunces), Georgia, serif;
 }
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.25s ease-out;
+}

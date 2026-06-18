@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { Sparkles, Loader2, FileUp } from "lucide-react";
 import LanguagePicker from "@/components/LanguagePicker";
+import Toast from "@/components/Toast";
 import { getSessionId } from "@/lib/session";
 import { getSamples } from "@/lib/samples";
 
@@ -173,12 +174,9 @@ export default function Home() {
           </button>
         </div>
 
-        {error && (
-          <p className="mt-4 rounded-lg bg-[#FBE4E0] p-3 text-sm font-medium text-urgent">
-            {error}
-          </p>
-        )}
       </section>
+
+      <Toast message={error} onClose={() => setError(null)} />
 
       <footer className="mt-auto pt-10 text-center text-xs text-muted">
         <p>
