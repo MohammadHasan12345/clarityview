@@ -15,9 +15,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "ClarityView — Understand any letter about your kid",
+  title: "ClarityView — Understand any confusing document",
   description:
-    "Upload, paste, or photograph any confusing document. ClarityView explains it in plain English and tells you what to do.",
+    "Paste any confusing document. ClarityView explains it in plain English and tells you what to do.",
 };
 
 export default function RootLayout({

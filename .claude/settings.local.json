@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(curl -s -o /tmp/about.html -w \"status=%{http_code}\\\\n\" http://localhost:3000/about)",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(npx tsc *)",
+      "PowerShell(git add -A)",
+      "PowerShell(git push origin main 2>&1)"
     ]
   }
 }

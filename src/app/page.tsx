@@ -46,12 +46,12 @@ export default function Home() {
           <Sparkles size={16} /> ClarityView
         </p>
         <h1 className="text-3xl font-bold leading-tight text-ink sm:text-4xl">
-          Understand any letter about your kid in 15 seconds.
+          Understand any confusing document in 15 seconds.
         </h1>
         <p className="mx-auto mt-4 max-w-lg text-base text-muted sm:text-lg">
-          Paste a confusing document — from school, a doctor, a court, or the
-          government. We&apos;ll explain it in plain English and tell you exactly
-          what to do.
+          Paste any letter, form, or notice — from school, a doctor, a court,
+          the government, or anywhere else. We&apos;ll explain it in plain
+          English and tell you exactly what to do.
         </p>
       </header>
 
@@ -90,10 +90,15 @@ export default function Home() {
         )}
       </section>
 
-      <p className="mt-auto pt-10 text-center text-xs text-muted">
-        ClarityView explains documents. It does not give legal or medical
-        advice. No information is shared without your choice.
-      </p>
+      <footer className="mt-auto pt-10 text-center text-xs text-muted">
+        <p>
+          ClarityView explains documents. It does not give legal or medical
+          advice. No information is shared without your choice.
+        </p>
+        <a href="/about" className="mt-2 inline-block font-medium text-accent hover:underline">
+          How ClarityView keeps you in control →
+        </a>
+      </footer>
     </main>
   );
 }
