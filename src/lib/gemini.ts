@@ -88,10 +88,13 @@ export async function analyzeDocument(
   text: string,
   targetLanguage: string = 'en'
 ): Promise<AnalysisResult> {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const dateContext = `Today's date is ${today}. Use it to judge urgency and deadlines.`;
+
   const userPrompt =
     targetLanguage === 'en'
-      ? `Analyze this document:\n\n---\n${text}\n---`
-      : `Analyze this document and respond in ${targetLanguage} (translate all string values including summary, checklist steps, and human_review_note). Keep the date formats as YYYY-MM-DD.\n\n---\n${text}\n---`;
+      ? `${dateContext}\n\nAnalyze this document:\n\n---\n${text}\n---`
+      : `${dateContext}\n\nAnalyze this document and respond in ${targetLanguage} (translate all string values including summary, checklist steps, and human_review_note). Keep the date formats as YYYY-MM-DD.\n\n---\n${text}\n---`;
 
   const response = await ai.models.generateContent({
     model: MODEL,

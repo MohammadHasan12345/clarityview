@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Sparkles, Loader2 } from "lucide-react";
 import LanguagePicker from "@/components/LanguagePicker";
 import { getSessionId } from "@/lib/session";
+import { getSamples } from "@/lib/samples";
 
 export default function Home() {
   const router = useRouter();
@@ -56,6 +57,29 @@ export default function Home() {
       </header>
 
       <section className="mt-8">
+        <div className="mb-4">
+          <p className="mb-2 text-sm font-medium text-muted">
+            New here? Try a sample document:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {getSamples().map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => {
+                  setText(s.text);
+                  setLanguage(s.language);
+                  setError(null);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-ink transition hover:border-accent"
+              >
+                <span>{s.emoji}</span>
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
