@@ -14,7 +14,7 @@ First-generation immigrant parents who work hourly jobs and receive English-only
 - Supabase (Postgres + Storage)
 - Google Gemini API (`@google/genai`, latest Gemini Flash model) — switched from Anthropic Claude to use the free tier for the hackathon
 - Vercel deployment via GitHub
-- pdf-parse for PDF text extraction
+- unpdf for PDF text extraction (serverless-safe; replaced pdf-parse, which failed on Vercel)
 
 ## Hard rules
 
