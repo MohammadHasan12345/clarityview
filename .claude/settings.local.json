@@ -15,7 +15,10 @@
       "Bash(ls node_modules/pdf-parse/dist/cjs)",
       "Bash(ls node_modules/pdf-parse/dist/esm)",
       "Bash(node -e *)",
-      "Bash(echo \"dev starting, pid $!\")"
+      "Bash(echo \"dev starting, pid $!\")",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_select_option",
+      "mcp__playwright__browser_take_screenshot"
     ]
   }
 }

@@ -8,6 +8,7 @@ import LanguagePicker from "@/components/LanguagePicker";
 import Toast from "@/components/Toast";
 import { getSessionId } from "@/lib/session";
 import { getSamples } from "@/lib/samples";
+import { getUI, isRTL } from "@/lib/i18n";
 
 export default function Home() {
   const router = useRouter();
@@ -17,36 +18,36 @@ export default function Home() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const onDrop = useCallback(async (files: File[]) => {
-    const file = files[0];
-    if (!file) return;
-    setError(null);
-    // Vercel caps upload bodies at ~4.5 MB. Stop big files before they fail.
-    if (file.size > 4 * 1024 * 1024) {
-      setError(
-        "That PDF is too big to upload (4 MB max). Try a smaller file, or copy and paste the text instead."
-      );
-      return;
-    }
-    setUploading(true);
-    try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data) {
-        throw new Error(
-          data?.error ||
-            "We couldn't read that PDF. Try a smaller file, or paste the text instead."
-        );
+  const t = getUI(language);
+
+  const onDrop = useCallback(
+    async (files: File[]) => {
+      const file = files[0];
+      if (!file) return;
+      setError(null);
+      // Vercel caps upload bodies at ~4.5 MB. Stop big files before they fail.
+      if (file.size > 4 * 1024 * 1024) {
+        setError(t.errPdfBig);
+        return;
       }
-      setText(data.text);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not read that PDF.");
-    } finally {
-      setUploading(false);
-    }
-  }, []);
+      setUploading(true);
+      try {
+        const form = new FormData();
+        form.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: form });
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data) {
+          throw new Error(data?.error || t.errPdfRead);
+        }
+        setText(data.text);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t.errPdfRead);
+      } finally {
+        setUploading(false);
+      }
+    },
+    [t]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -58,7 +59,7 @@ export default function Home() {
   async function handleSubmit() {
     setError(null);
     if (text.trim().length < 30) {
-      setError("Please paste a bit more text so we can understand the document.");
+      setError(t.errShort);
       return;
     }
     setLoading(true);
@@ -74,36 +75,35 @@ export default function Home() {
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data) {
-        throw new Error(data?.error || "Something went wrong. Please try again.");
+        throw new Error(data?.error || t.errGeneric);
       }
       router.push(`/result/${data.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : t.errGeneric);
       setLoading(false);
     }
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-10 sm:py-16">
+    <main
+      dir={isRTL(language) ? "rtl" : "ltr"}
+      className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-10 sm:py-16"
+    >
       <header className="text-center">
         <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent-soft px-4 py-1.5 text-sm font-semibold text-accent">
           <Sparkles size={16} /> ClarityView
         </p>
         <h1 className="text-3xl font-bold leading-tight text-ink sm:text-4xl">
-          Understand any confusing document in 15 seconds.
+          {t.heroTitle}
         </h1>
         <p className="mx-auto mt-4 max-w-lg text-base text-muted sm:text-lg">
-          Paste any letter, form, or notice — from school, a doctor, a court,
-          the government, or anywhere else. We&apos;ll explain it in plain
-          English and tell you exactly what to do.
+          {t.heroSub}
         </p>
       </header>
 
       <section className="mt-8">
         <div className="mb-4">
-          <p className="mb-2 text-sm font-medium text-muted">
-            New here? Try a sample document:
-          </p>
+          <p className="mb-2 text-sm font-medium text-muted">{t.tryHeading}</p>
           <div className="flex flex-wrap gap-2">
             {getSamples().map((s) => (
               <button
@@ -117,7 +117,7 @@ export default function Home() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-ink transition hover:border-accent"
               >
                 <span>{s.emoji}</span>
-                {s.label}
+                {t.samples[s.id as keyof typeof t.samples] ?? s.label}
               </button>
             ))}
           </div>
@@ -132,17 +132,15 @@ export default function Home() {
           <input {...getInputProps()} />
           {uploading ? (
             <span className="inline-flex items-center gap-2 text-sm font-medium text-ink">
-              <Loader2 size={20} className="animate-spin" /> Reading your PDF…
+              <Loader2 size={20} className="animate-spin" /> {t.uploading}
             </span>
           ) : (
             <>
               <FileUp size={28} className="text-accent" />
               <span className="mt-2 text-sm font-medium text-ink">
-                Drop a PDF here, or tap to choose a file
+                {t.dropMain}
               </span>
-              <span className="mt-1 text-xs text-muted">
-                We&apos;ll pull out the text — or just paste it below.
-              </span>
+              <span className="mt-1 text-xs text-muted">{t.dropSub}</span>
             </>
           )}
         </div>
@@ -150,13 +148,17 @@ export default function Home() {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Paste the text of your letter here…"
+          placeholder={t.placeholder}
           rows={10}
           className="w-full resize-y rounded-2xl border border-border bg-card p-4 text-base text-ink placeholder:text-muted focus:border-accent focus:outline-none"
         />
 
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <LanguagePicker value={language} onChange={setLanguage} />
+          <LanguagePicker
+            value={language}
+            onChange={setLanguage}
+            label={t.resultIn}
+          />
           <button
             type="button"
             onClick={handleSubmit}
@@ -165,26 +167,24 @@ export default function Home() {
           >
             {loading ? (
               <>
-                <Loader2 size={20} className="animate-spin" /> Reading your
-                document…
+                <Loader2 size={20} className="animate-spin" /> {t.submitting}
               </>
             ) : (
-              "Explain this for me"
+              t.submit
             )}
           </button>
         </div>
-
       </section>
 
       <Toast message={error} onClose={() => setError(null)} />
 
       <footer className="mt-auto pt-10 text-center text-xs text-muted">
-        <p>
-          ClarityView explains documents. It does not give legal or medical
-          advice. No information is shared without your choice.
-        </p>
-        <a href="/about" className="mt-2 inline-block font-medium text-accent hover:underline">
-          How ClarityView keeps you in control →
+        <p>{t.footer}</p>
+        <a
+          href="/about"
+          className="mt-2 inline-block font-medium text-accent hover:underline"
+        >
+          {t.aboutLink}
         </a>
       </footer>
     </main>
